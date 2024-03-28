@@ -5,6 +5,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
+import kpiRoutes from "./routes/kpi.js";
+import KPI from "./models/KPI.js";
+import { kpis } from "./data/data.js";
 
 // configurations
 dotenv.config();
@@ -17,6 +20,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-console.log("It's alive!!!");
+// RPutes
+app.use("kpi", kpiRoutes);
 
 // mongoose setup
+const PORT = process.env.PORT || 9000;
+const mongoURI = process.env.DB_CONNECTION;
+mongoose
+  .connect(mongoURI)
+  .then(async () => {
+    app.listen(PORT, () => {
+      console.log(`It's alive!!! On port: ${PORT}`);
+    });
+    //  Add data one time only or as needed
+    // await mongoose.connection.db.dropDatabase();
+    // KPI.insertMany(kpis);
+  })
+  .catch((err) =>
+    console.log(`Failed to connect to MongoDB with error ${err}`)
+  );
